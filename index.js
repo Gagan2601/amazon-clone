@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require('body-parser');
@@ -6,24 +7,27 @@ const products = require('./routes/product');
 const user = require('./routes/user');
 const PORT = process.env.PORT || 5000;
 const app = express();
-const DB = "mongodb+srv://gagan:gagan123@cluster0.703ikio.mongodb.net/?retryWrites=true&w=majority"
+const DB = process.env.DB_ATLAS;
 
 app.use(express.json());
-mongoose
-  .connect(DB)
-  .then(() => {
-    console.log("Connection Successful");
-  })
-  .catch((e) => {
-    console.log(e);
-  });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connection Successful");
+    app.listen(PORT, () => {
+      console.log(`connected at port ${PORT}`);
+    });
+  })
+  .catch((e) => {
+    console.error("Connection Error:", e);
+    process.exit(1);
+  });
 
 app.use('/auth',auth);
 app.use('/api',products);
 app.use('/api',user);
-
-app.listen(PORT, () => {
-    console.log(`connected at port ${PORT}`);
-  });
