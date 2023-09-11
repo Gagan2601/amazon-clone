@@ -2,6 +2,8 @@ const User = require('../models/user');
 const Seller = require('../models/seller');
 const bcrypt = require('bcrypt');
 const { signToken } = require('../middlewares/jwtAuth');
+const Admin = require('../models/admin');
+const errorHandler = require('../middlewares/errorHandler');
 
 const register = async (req, res, Model, errorMessage) => {
     try {
@@ -22,7 +24,7 @@ const register = async (req, res, Model, errorMessage) => {
         await newEntity.save();
         res.status(201).json({ message: `${Model.modelName} registered successfully` });
     } catch (err) {
-        res.status(500).json({ message: 'Internal server error' });
+        errorHandler(err, req, res);
     }
 };
 
@@ -48,7 +50,7 @@ const login = async (req, res, Model, errorMessage) => {
         const token = signToken(tokenPayload);
         res.status(200).json({ token, entity });
     } catch (err) {
-        res.status(500).json({ message: 'Internal server error' });
+        errorHandler(err, req, res);
     }
 };
 
@@ -79,4 +81,12 @@ exports.sellerLogin = (req, res) => {
 
 exports.sellerData = (req, res) => {
     getData(req, res, Seller);
+};
+
+exports.adminRegister = (req, res) => {
+    register(req, res, Admin, 'Admin already exists');
+};
+
+exports.adminLogin = (req, res) => {
+    login(req, res, Admin, 'Admin not found');
 };

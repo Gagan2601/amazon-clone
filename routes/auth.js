@@ -11,4 +11,7 @@ router.post('/seller/register', auth.sellerRegister);
 router.post('/seller/login', auth.sellerLogin);
 router.get('/seller/profile', authenticateToken, auth.sellerData);
 
+router.post('/admin/register', auth.adminRegister);
+router.post('/admin/login', auth.adminLogin);
+
 module.exports = router;

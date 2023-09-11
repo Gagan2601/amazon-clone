@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'GaganGigaC$had';
+const JWT_SECRET = process.env.JWT_SECRET;
 const authenticateToken = (req, res, next) => {
   const token = req.header('auth-token');
   if (!token) {
