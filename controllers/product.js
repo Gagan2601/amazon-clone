@@ -3,6 +3,9 @@ const Seller = require("../models/seller");
 const Review = require("../models/review");
 const Notification = require("../models/notification");
 const errorHandler = require("../middlewares/errorHandler");
+const stripe = require("stripe")(
+  "sk_test_51Nqw75SCRj0uEtF7tjARAuGK6ISSGa0FfdWaSKqrHfhZO294ntO1JXvKuGmNfqEFCWCJAhgGdC2Vf0GdypDDId3Q00ha0ocO0T"
+);
 
 exports.addProduct = async (req, res) => {
   try {
@@ -184,6 +187,41 @@ exports.getReviewsByProductId = async (req, res) => {
   }
 };
 
+exports.checkout = async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: product.title,
+            },
+            unit_amount: product.discountedPrice * 100,
+          },
+          quantity: quantity,
+        },
+      ],
+      mode: "payment",
+      success_url: `http://localhost:3000/product/order?price=${
+        product.discountedPrice * quantity
+      }&address=${encodeURIComponent("Your Shipping Address")}`,
+      cancel_url: "http://localhost:3000/user/cart",
+    });
+    res.json({ sessionId: session.id });
+  } catch (err) {
+    errorHandler(err, req, res);
+  }
+};
+
 exports.dealoftheday = async (req, res) => {
   try {
     const products = await Product.find({}).populate("reviews");
@@ -198,14 +236,20 @@ exports.dealoftheday = async (req, res) => {
   }
 };
 
-exports.createNotification = async (sellerId, userId, orderId, productId) => {
+exports.createNotification = async (
+  sellerId,
+  userId,
+  orderId,
+  productId,
+  message
+) => {
   try {
     const notification = new Notification({
       seller: sellerId,
       order: orderId,
       user: userId,
       product: productId,
-      message: "You have a new order for your product.",
+      message: message || "You have a new order for your product.",
     });
     await notification.save();
   } catch (error) {

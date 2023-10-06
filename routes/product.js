@@ -30,6 +30,8 @@ router.post("/review-product", authenticateToken, products.reviewProduct);
 router.get("/deal-of-day", authenticateToken, products.dealoftheday);
 
 router.get("/products/filter", products.filterAndSortProducts);
+
+router.post("/create-checkout-session", products.checkout);
 //Ex :- /products/filter?category=Electronics&minPrice=100&maxPrice=500&sortBy=discountedPrice&sortOrder=asc
 
 module.exports = router;

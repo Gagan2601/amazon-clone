@@ -18,7 +18,11 @@ router.delete("/remove-from-cart/:id", authenticateToken, user.removeFromCart);
 
 router.post("/order", authenticateToken, user.order);
 
-router.get("/seller/orders", authenticateToken, user.getSellerNotifications);
+router.get(
+  "/seller/notifications",
+  authenticateToken,
+  user.getSellerNotifications
+);
 
 router.get("/orders/me", authenticateToken, user.myOrders);
 

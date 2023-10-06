@@ -160,14 +160,16 @@ exports.removeFromCart = async (req, res) => {
 
 exports.order = async (req, res) => {
   try {
-    const { totalPrice, shippingAddress } = req.body;
+    const { totalPrice } = req.body;
     const userId = req.user;
     const userCart = await Cart.findOne({ user: userId });
+    const user = await User.findById(userId);
     if (!userCart || userCart.items.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
     }
     let totalQuantity = 0;
     const productsToUpdate = [];
+    const sellerNotifications = [];
     for (const cartItem of userCart.items) {
       const product = await Product.findById(cartItem.product);
       if (!product) {
@@ -180,11 +182,20 @@ exports.order = async (req, res) => {
       }
       totalQuantity += cartItem.quantity;
       productsToUpdate.push({ product, quantity: cartItem.quantity });
+      const sellerId = product.seller;
+      sellerNotifications.push({
+        sellerId,
+        userId,
+        productId: product._id,
+        productName: product.title,
+        quantity: cartItem.quantity,
+        userAddress: `${user.address.addressline1} ${user.address.addressline2}, ${user.address.city}, ${user.address.state}, ${user.address.postalCode}`,
+      });
     }
-    const user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
+    const shippingAddress = `${user.address.addressline1} ${user.address.addressline2}, ${user.address.city}, ${user.address.state}, ${user.address.postalCode}`;
     userCart.items = [];
     const order = new Order({
       products: productsToUpdate.map((item) => ({
@@ -200,17 +211,16 @@ exports.order = async (req, res) => {
     const savedOrder = await order.save();
     user.orders.push(savedOrder._id);
     await user.save();
-    const orderNotify = await Order.findById(savedOrder._id).populate(
-      "products.product"
-    );
-    const sellerId = orderNotify.products[0].product.seller;
-    const productId = orderNotify.products[0].product._id;
-    await NotificationController.createNotification(
-      sellerId,
-      userId,
-      savedOrder._id,
-      productId
-    );
+    for (const notificationData of sellerNotifications) {
+      await NotificationController.createNotification(
+        notificationData.sellerId,
+        notificationData.userId,
+        savedOrder._id,
+        notificationData.productId,
+        `New order for ${notificationData.productName} (${notificationData.quantity} units) from ${notificationData.userAddress}`
+      );
+    }
+
     await userCart.save();
     res.status(200).json(savedOrder);
   } catch (err) {
