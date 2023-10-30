@@ -276,6 +276,102 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
+exports.getSellerOrderDetails = async (req, res) => {
+  try {
+    const sellerId = req.user._id;
+    const { id } = req.params;
+    const order = await Order.findOne({
+      _id: id,
+    })
+      .populate("userId", "name email")
+      .populate({
+        path: "products.product",
+        model: "Product",
+        select: "title discountedPrice seller",
+        populate: {
+          path: "seller",
+          model: "Seller",
+          select: "name email",
+        },
+      });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    const hasMatchingProduct = order.products.some((product) =>
+      product.product.seller._id.equals(sellerId)
+    );
+    if (!hasMatchingProduct) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    res.status(200).json(order);
+  } catch (err) {
+    errorHandler(err, req, res);
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const sellerId = req.user._id;
+    const { id } = req.params;
+    const { status } = req.body;
+    const order = await Order.findOne({
+      _id: id,
+    })
+      .populate("userId", "name email")
+      .populate({
+        path: "products.product",
+        model: "Product",
+        select: "title discountedPrice seller",
+        populate: {
+          path: "seller",
+          model: "Seller",
+          select: "name email",
+        },
+      });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    const hasMatchingProduct = order.products.some((product) =>
+      product.product.seller._id.equals(sellerId)
+    );
+
+    if (!hasMatchingProduct) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    order.status = status;
+    await order.save();
+
+    res.status(200).json({ message: "Order status updated successfully" });
+  } catch (err) {
+    errorHandler(err, req, res);
+  }
+};
+
+exports.getSellerOrders = async (req, res) => {
+  try {
+    const sellerId = req.user._id; 
+    const sellerProducts = await Product.find({ seller: sellerId });
+    const productIds = sellerProducts.map((product) => product._id);
+    const sellerOrders = await Order.find({
+      "products.product": { $in: productIds },
+    })
+      .populate("userId", "name email")
+      .populate("products.product", "title discountedPrice");
+
+    if (!sellerOrders || sellerOrders.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No orders found for this seller" });
+    }
+
+    res.status(200).json(sellerOrders);
+  } catch (err) {
+    errorHandler(err, req, res);
+  }
+};
+
 // //This controller need to be put at correct place
 // exports.changeStatus = async (req, res) => {
 //     try {

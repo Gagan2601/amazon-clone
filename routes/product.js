@@ -34,4 +34,6 @@ router.get("/products/filter", products.filterAndSortProducts);
 router.post("/create-checkout-session", products.checkout);
 //Ex :- /products/filter?category=Electronics&minPrice=100&maxPrice=500&sortBy=discountedPrice&sortOrder=asc
 
+router.get("/products/:productId", authenticateToken, products.fetchProductDetails);
+
 module.exports = router;

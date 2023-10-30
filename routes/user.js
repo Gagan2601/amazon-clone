@@ -28,6 +28,16 @@ router.get("/orders/me", authenticateToken, user.myOrders);
 
 router.delete("/cancel-order/:id", authenticateToken, user.cancelOrder);
 
+router.get("/sellers/order/:id", authenticateToken, user.getSellerOrderDetails);
+
+router.put(
+  "/sellers/order-status/:id",
+  authenticateToken,
+  user.updateOrderStatus
+);
+
+router.get("/sellers/orders", authenticateToken, user.getSellerOrders);
+
 // //This router needs to be put at correct place with correct authentication
 // router.post('/change-order-status', user.changeStatus);
 
