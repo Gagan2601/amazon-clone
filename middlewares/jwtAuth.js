@@ -1,22 +1,25 @@
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET;
-const authenticateToken = (req, res, next) => {
-  const token = req.header('auth-token');
-  if (!token) {
-    return res.status(401).json({ message: 'Missing token' });
-  }
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: 'Invalid token' });
-    }
-    req.user = user;
-    next();
-  });
-};
-const signToken = (tokenPayload) => {
-  return jwt.sign(tokenPayload, JWT_SECRET, {
-    expiresIn: '1h',
-  });
-};
+const { ErrorHandler } = require('./errorHandler');
+const bigPromise = require("./bigPromise");
+const JwtService = require('../utils/jwtService');
 
-module.exports = { authenticateToken, signToken };
+const authenticateToken = bigPromise((req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return ErrorHandler(res, 400, "unAuthorized");
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const { _id,email } = JwtService.verify(token);
+    req.user = {
+      _id,
+      email
+    };
+    next();
+  } catch (err) {
+    return ErrorHandler(res, 403, 'Invalid token');
+  }
+});
+
+module.exports = { authenticateToken };

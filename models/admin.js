@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const {validateEmail} = require("../validations/common");
 const adminSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -9,7 +8,6 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        validate: validateEmail,
     },
     password: {
         type: String,

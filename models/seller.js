@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const addressSchema  = require("./address");
-const { validateEmail } = require('../validations/common');
 const sellerSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -10,7 +9,6 @@ const sellerSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        validate: validateEmail,
     },
     password: {
         type: String,

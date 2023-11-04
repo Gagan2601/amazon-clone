@@ -38,7 +38,7 @@ router.put(
 
 router.get("/sellers/orders", authenticateToken, user.getSellerOrders);
 
-// //This router needs to be put at correct place with correct authentication
+//This router needs to be put at correct place with correct authentication
 // router.post('/change-order-status', user.changeStatus);
 
 module.exports = router;

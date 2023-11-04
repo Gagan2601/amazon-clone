@@ -1,62 +1,125 @@
 const User = require('../models/user');
 const Seller = require('../models/seller');
-const bcrypt = require('bcrypt');
-const { signToken } = require('../middlewares/jwtAuth');
 const Admin = require('../models/admin');
-const errorHandler = require('../middlewares/errorHandler');
+const jwt = require('../utils/jwtService');
+const {ControllerResponse, ErrorHandler} = require('../middlewares/errorHandler');
+const RefreshToken = require('../models/refreshToken'); 
+const { hashPassword, verifyPassword } = require("../middlewares/encryption");
 
-const register = async (req, res, Model, errorMessage) => {
-    try {
-        const { name, email, password } = req.body;
-        const existingEntity = await Model.findOne({ email });
+function checkEmail(email) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+}
 
-        if (existingEntity) {
-            return res.status(400).json({ message: errorMessage });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newEntity = new Model({
-            name,
-            email,
-            password: hashedPassword,
+const register = async (req, res, Model) => {
+    const {
+        email,
+        password,
+        name,
+      } = req.body;
+      console.log(req.body);
+      if (checkEmail(email) == false) {
+        return ErrorHandler(res, 400, "Invalid Email");
+      }
+      if (password == null || password == undefined || password.length < 6) {
+        return ErrorHandler(res, 400, "Invalid Password");
+      }
+      const userExist = await Model.findOne({ email });
+      if (userExist) {
+        return ErrorHandler(res, 400, "Email already exists");
+      }
+      try {
+        const user = await Model.create({
+          email,
+          password: await hashPassword(password),
+          name
         });
-
-        await newEntity.save();
-        res.status(201).json({ message: `${Model.modelName} registered successfully` });
-    } catch (err) {
-        errorHandler(err, req, res);
-    }
+        user.save();
+        const access_token = jwt.sign({
+          _id: user._id,
+          email });
+        const refresh_token = jwt.sign(
+          {
+            _id: user._id,
+            email
+    
+          },
+          process.env.REFRESH_TOKEN_KEY,
+          "30d"
+        );
+        await RefreshToken.create({ token: refresh_token });
+        delete user._doc.password;
+        return ControllerResponse(res, 200, {
+          message: "Signup Successfull!",
+          ...user._doc,
+          refresh_token,
+          access_token,
+        });
+      } catch (err) {
+        console.log(err);
+        ErrorHandler(res, 500, "Internal Server Error");
+      }
 };
 
-const login = async (req, res, Model, errorMessage) => {
-    try {
-        const { email, password } = req.body;
-        const entity = await Model.findOne({ email });
+const login = async (req, res, Model) => {
+    const { email, password } = req.body;
 
-        if (!entity) {
-            return res.status(404).json({ message: errorMessage });
-        }
+  if (!email || !password) {
+    return ErrorHandler(res, 400, "Username/Email and password are required");
+  }
+  try {
+    const user = await Model.findOne({
+      email: email ,
+    });
 
-        const passwordMatch = await bcrypt.compare(password, entity.password);
-
-        if (!passwordMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-
-        const tokenPayload = {
-            _id: entity._id,
-        };
-
-        const token = signToken(tokenPayload);
-        res.status(200).json({ token, entity });
-    } catch (err) {
-        errorHandler(err, req, res);
+    if (!user) {
+      return ErrorHandler(res, 403, "Invalid credentials");
     }
+
+    const isPasswordValid = await verifyPassword(password, user.password);
+    if (!isPasswordValid) {
+      return ErrorHandler(res, 403, "Invalid credentials");
+    }
+    const access_token = jwt.sign({
+      _id: user._id,
+      email:user.email
+    });
+
+    const refresh_token = jwt.sign(
+      {
+        _id: user._id,
+        email: user.email
+      },
+      process.env.REFRESH_TOKEN_KEY,
+      "30d"
+    );
+    await RefreshToken.create({ token: refresh_token });
+
+    delete user._doc.password;
+    return ControllerResponse(res, 200, {
+      message: "Login Successful!",
+      ...user._doc,
+      refresh_token,
+      access_token
+    });
+  } catch (err) {
+    console.log(err);
+    ErrorHandler(res, 500, "Internal Server Error");
+  }
 };
 
-const getData = async (req, res, Model) => {
-    const entity = await Model.findById(req.user);
-    res.json({ ...entity._doc, token: req.token });
+const getData= async (req, res, Model) => {
+try {
+    const entity = await Model.findById(req.user._id);
+    delete entity._doc.password;
+    return ControllerResponse(res, 200, {
+    ...entity._doc,
+    });
+
+} catch (err) {
+    console.log(err);
+    ErrorHandler(res, 500, "Internal Server Error");
+}
 };
 
 exports.userRegister = (req, res) => {
