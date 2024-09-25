@@ -1,0 +1,113 @@
+.signin-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    max-width: 400px;
+    width: 100%;
+    margin: auto;
+  }
+  
+  h1 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  label{
+    font-weight: bold;
+    font-size: small;
+  }
+
+  .input {
+    font-size: small;
+    height: 2rem;
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+    border: 1px solid #6e6e6e;
+    border-radius: 4px;
+  }
+  
+  .button {
+    background-color: #ffd000;
+    color: black;
+    border: none;
+    width: 100%;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 2px 2px #ccc;
+  }
+  
+  .button:hover{
+    background-color: #f0c14b;
+  }
+
+  .button2 {
+    background-color: #ffffff;
+    color: #111;
+    border: 2px solid #ccc;
+    width: 100%;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button2:hover {
+    background-color: #c9c9c9;
+  }
+  
+  .new-to-amazon {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+  }  
+  .logo1_img{
+    height: 2.3rem;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+.logo1_country{
+    font-size: 0.8rem;
+    color: black;
+    margin-left: 5px;
+}
+.blur-line {
+  width: 100%;
+  height: 2px; 
+  background: linear-gradient(to right, transparent 0%, rgba(131, 131, 131, 0.3) 40%, rgba(131, 131, 131, 0.3) 50%, rgba(131, 131, 131, 0.3) 60%, transparent 100%);
+  margin: 30px 0;
+  filter: blur(1px);
+}
+.footer {
+  text-align: center;
+}
+
+.footer-links {
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  margin: 0 8px;
+  text-decoration: none;
+  font-size: small;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.footer p {
+  margin: 0;
+}

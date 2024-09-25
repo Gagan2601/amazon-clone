@@ -1,0 +1,28 @@
+.h-orders {
+  border: 1px solid transparent;
+  padding: 0.7rem 0.5rem;
+  cursor: pointer;
+}
+.h-orders:hover {
+  border-radius: 2px;
+  border-color: white;
+}
+.h-orders_hint {
+  display: flex;
+  font-size: 0.7rem;
+}
+
+.h-orders_title {
+  font-weight: bolder;
+  font-size: 0.9rem;
+}
+@media (max-width: 768px) {
+  .h-orders {
+    display: flex;
+    justify-content: center;
+  }
+  .h-orders_hint {
+    display: block;
+    justify-content: center;
+  }
+}

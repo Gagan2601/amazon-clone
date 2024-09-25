@@ -1,0 +1,33 @@
+.language {
+    display: flex;
+    border: 1px solid transparent;
+    padding: 0.9rem 0.5rem;
+    cursor: pointer;
+}
+.language:hover{
+    border-radius: 2px;
+    border-color: white;
+}
+.language_title {
+    font-weight: bold;
+    padding-left: 0.1rem;
+    padding-top: 0.1rem;
+    font-size: 0.9rem;
+}
+.language_arrow {
+    color: #cccccc;
+    margin-bottom: -0.5rem;
+  }
+  @media (max-width: 768px) {
+    .language {
+        display: flex;
+        justify-content: center;
+    }
+    .language_title {
+        display: block;
+        justify-content: center;
+    }
+    .language_arrow {
+        display: none;
+    }
+  }

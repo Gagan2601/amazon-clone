@@ -1,0 +1,24 @@
+a {
+    border: 1px solid transparent;
+}
+a:hover{
+    border-radius: 2px;
+    border-color: white;
+}
+.logo {
+    display: flex;
+    margin: 0.3rem;
+    padding: 1.5rem 1.3rem 0 0.5rem;
+    position: relative; 
+}
+.logo_img{
+    height: 2.2rem;
+    max-width: 100%;
+}
+.logo_country{
+    position: absolute;
+    font-size: 0.8rem;
+    right: 7px;
+    bottom: 1.1rem;
+    color: white
+}

@@ -1,0 +1,38 @@
+.location {
+    display: flex;
+    align-items: flex-end;
+    border: 1px solid transparent;
+    padding: 0.7rem 0.5rem;
+}
+.location:hover{
+    border-radius: 2px;
+    border-color: white;
+    cursor: pointer;
+}
+.location_pin{
+    margin-right: 0.1rem;
+    margin-bottom: 0.1rem;
+}
+.location_hint{
+    display: flex;
+    color: #cccccc;
+    font-size: 0.7rem;
+}
+.location_title{
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+@media (max-width: 768px) {
+    .location {
+        display: flex;
+        justify-content: center;
+    }
+    .location_hint {
+        display: block;
+        justify-content: center;
+    }
+    .location_arrow {
+        display: none;
+    }
+  }
+
