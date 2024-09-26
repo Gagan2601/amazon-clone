@@ -19,7 +19,7 @@ function OrderPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           totalPrice,
@@ -36,7 +36,7 @@ function OrderPage() {
   };
 
   return (
-    <Container >
+    <Container>
       <h2>Your Order Summary</h2>
       <p>Total Price: ${totalPrice}</p>
       <p>Shipping Address: {shippingAddress}</p>
