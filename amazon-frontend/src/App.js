@@ -104,7 +104,6 @@ function App() {
           return response.json();
         })
         .then((userData) => {
-          console.log(userData);
           setIsSignedIn(true);
           setData(userData.data);
         })

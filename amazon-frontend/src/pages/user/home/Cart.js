@@ -71,12 +71,9 @@ function Cart({ updateCartCount }) {
 
       if (response.ok) {
         const sessionData = await response.json();
-        if (!stripe) {
-          console.error("Stripe has not been initialized yet");
-          return;
-        }
-        const { error } = await stripe.redirectToCheckout({
-          sessionId: sessionData.data.sessionId,
+        const stripePromise = await stripe;
+        const { error } = await stripePromise.redirectToCheckout({
+          sessionId: sessionData.sessionId,
         });
 
         if (error) {

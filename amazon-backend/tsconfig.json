@@ -19,8 +19,8 @@
       "resolveJsonModule": true,
       "paths": {
           "@/": ["./src/"]
-      },
+      }
   },
-  "include": ["*.ts" ],
+  "include": ["*.ts"],
   "exclude": ["node_modules", "dist", "*coverage", "logs", "scripts"]
 }
